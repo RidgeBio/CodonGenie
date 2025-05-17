@@ -5,7 +5,7 @@ codonGenieApp.controller("codonGenieCtrl", ["$scope", "$http", "$log", "ErrorSer
 	self.codon_pattern = "[acgtmrwsykvhdbnACGTMRWSYKVHDBN]{3}";
 	self.aa_pattern = "[acdefghiklmnpqrstvwyACDEFGHIKLMNPQRSTVWY]"
 	self.aa_seq_pattern = `${self.aa_pattern}+`
-	self.edit_pattern = `${self.aa_pattern}[0-9]+${self.aa_pattern}`
+	self.edit_pattern = `${self.aa_pattern}[0-9]+\\-?${self.aa_pattern}+`
 	self.edits_pattern = `${self.edit_pattern}(,${self.edit_pattern})*`
 	
 	var results = null;

@@ -8,6 +8,7 @@ All rights reserved.
 import itertools
 # pylint: disable=wrong-import-order
 from collections import defaultdict
+import re
 
 import Bio.Data.CodonTable as CodonTable
 
@@ -55,6 +56,7 @@ NUCL_CODES = {
 
 INV_NUCL_CODES = {val: key for key, val in NUCL_CODES.items()}
 
+_EDIT_PATTERN = re.compile(r"([A-Z])(\d+)(-?)([A-Z]+)")
 
 class CodonSelector():
     '''Class to optimise codon selection.'''
@@ -74,13 +76,15 @@ class CodonSelector():
         for edit in edits.split(','):
             if not edit:
                 continue
-            prev_aa, pos, new_aa = self._parse_edit(edit)
+            prev_aa, pos, new_aa = _parse_edit(edit)
             if pos >= len(aa_seq) or aa_seq[pos] != prev_aa:
                 raise ValueError("Edit '{}' is invalid".format(edit))
             if pos in edited_positions:
                 edited_positions[pos] = edited_positions[pos] + new_aa
             else:
                 edited_positions[pos] = new_aa
+        if not edited_positions:
+            return []
         res = list()
         for pos in range(0, len(aa_seq)):
             if pos in edited_positions:
@@ -174,8 +178,19 @@ class CodonSelector():
 
         return self.__codon_opt[tax_id]
 
-    def _parse_edit(self, edit):
-        return (edit[0], int(edit[1:-1]) - 1, edit[2])
+
+def _parse_edit(edit):
+    '''Parses an edit.'''
+    match = _EDIT_PATTERN.match(edit)
+    if not match:
+        raise ValueError(f"Invalid edit: {edit}")
+    orig = match.group(1)
+    pos = int(match.group(2)) - 1
+    invert = match.group(3) == '-'
+    new = set(match.group(4))
+    if invert:
+        new = CODONS.keys() - new - {'Stop'}
+    return (orig, pos, "".join(new))
 
 def _optimise_pos_3(options):
     options = list({tuple(sorted(set(opt)))
