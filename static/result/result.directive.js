@@ -2,6 +2,7 @@ resultApp.directive("resultPanel", function() {
     return {
     	scope: {
     		"results": "&",
+			"queryMode": "<",
     	},
         templateUrl: "/static/result/result.html",
         link: function(scope, element, attrs) {
@@ -19,6 +20,15 @@ resultApp.directive("resultPanel", function() {
             scope.toCodonString = function(array) {
             	return "[" + array.join("|") + "]";
             };
+
+			scope.codonSequence = function() {
+				results = scope.results();
+				if (results == null || results.length == 0) {
+					return '';
+				}
+				seq = scope.results().map((x) => x['ambiguous_codon']).join('');
+				return seq;
+			}
         }
     };
 });

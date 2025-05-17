@@ -34,7 +34,7 @@
             <a class="navbar-brand" href=".">
                 <span><img alt="GeneGenie Bioinformatics"
                            class="icon" src="static/favicon.ico"></span>
-                CodonGenie
+                CodonGenie - Ridge Bio
             </a>
         </div>
     </div>
@@ -44,6 +44,10 @@
     <div class="panel panel-default">
         <div class="result-panel panel-body">
             <ul class="nav nav-tabs">
+                <li data-ng-class="{active: ctrl.query.mode == 'aaSeq'}"
+                    role="presentation">
+                    <a data-ng-click="ctrl.query.mode = 'aaSeq'">Sequence</a>
+                </li>
                 <li data-ng-class="{active: ctrl.query.mode == 'aminoAcids'}"
                     role="presentation">
                     <a data-ng-click="ctrl.query.mode = 'aminoAcids'">Design</a>
@@ -56,6 +60,35 @@
             <form class="form-horizontal" data-ng-submit="ctrl.submit()"
                   name="form" role="form">
                 <fieldset data-ng-disabled="ctrl.isCalculating">
+                    <div class="row" data-ng-show="ctrl.query.mode == 'aaSeq'">
+                        <label class="col-xs-3 col-form-label">Backbone:</label>
+                        <div class="col-xs-9">
+                            <input autocomplete="off"
+                                   class="form-control uppercase"
+                                   data-ng-disabled="ctrl.query.mode != 'aaSeq'"
+                                   data-ng-model="ctrl.query.aaSeq"
+                                   data-ng-model-options="{ debounce: 500 }"
+                                   data-ng-pattern="ctrl.aa_seq_pattern"
+                                   data-ng-required="ctrl.query.mode == 'aaSeq'"
+                                   minLength="1"
+                                   placeholder="AFG"
+                                   type="text">
+                        </div>
+                    </div>
+                    <div class="row" data-ng-show="ctrl.query.mode == 'aaSeq'">
+                        <label class="col-xs-3 col-form-label">Edits:</label>
+                        <div class="col-xs-9">
+                            <input autocomplete="off"
+                                   class="form-control uppercase"
+                                   data-ng-disabled="ctrl.query.mode != 'aaSeq'"
+                                   data-ng-model="ctrl.query.edits"
+                                   data-ng-model-options="{ debounce: 1000 }"
+                                   data-ng-pattern="ctrl.edits_pattern"
+                                   data-ng-required="ctrl.query.mode == 'aaSeq'"
+                                   placeholder="A1D,A1G,F2Y"
+                                   type="text">
+                        </div>
+                    </div>
                     <div class="row"
                          data-ng-show="ctrl.query.mode == 'aminoAcids'">
                         <div class="aa non-polar">
@@ -197,7 +230,7 @@
 </div>
 
 <div class="col-md-8" data-ng-show="ctrl.results()">
-    <result-panel results="ctrl.results()"></result-panel>
+    <result-panel results="ctrl.results()" query-mode="ctrl.query.mode"></result-panel>
 </div>
 </body>
 </html>

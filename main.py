@@ -61,7 +61,11 @@ def get_organisms(term):
 @app.route('/codons')
 def get_codons():
     '''Gets codons.'''
-    if 'aminoAcids' in request.args:
+    if 'aaSeq' in request.args:
+        codons = _CODON_SELECTOR.optimise_codons_seq(request.args['aaSeq'],
+                                                     request.args.get('edits', default = ''),
+                                                     request.args['organism'])
+    elif 'aminoAcids' in request.args:
         codons = _CODON_SELECTOR.optimise_codons(request.args['aminoAcids'],
                                                  request.args['organism'])
     else:

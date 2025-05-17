@@ -69,6 +69,27 @@ class CodonSelector():
 
         self.__codon_opt = {}
 
+    def optimise_codons_seq(self, aa_seq, edits, organism_id):
+        edited_positions = dict()
+        for edit in edits.split(','):
+            if not edit:
+                continue
+            prev_aa, pos, new_aa = self._parse_edit(edit)
+            if pos >= len(aa_seq) or aa_seq[pos] != prev_aa:
+                raise ValueError("Edit '{}' is invalid".format(edit))
+            if pos in edited_positions:
+                edited_positions[pos] = edited_positions[pos] + new_aa
+            else:
+                edited_positions[pos] = new_aa
+        res = list()
+        for pos in range(0, len(aa_seq)):
+            if pos in edited_positions:
+                codons = self.optimise_codons(edited_positions.get(pos), organism_id)
+            else:
+                codons = self.optimise_codons(aa_seq[pos], organism_id)
+            res.append(codons[0])
+        return res
+
     def optimise_codons(self, amino_acids, organism_id):
         '''Optimises codon selection.'''
         req_amino_acids = set(amino_acids.upper())
@@ -153,6 +174,8 @@ class CodonSelector():
 
         return self.__codon_opt[tax_id]
 
+    def _parse_edit(self, edit):
+        return (edit[0], int(edit[1:-1]) - 1, edit[2])
 
 def _optimise_pos_3(options):
     options = list({tuple(sorted(set(opt)))
